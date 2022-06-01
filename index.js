@@ -61,47 +61,55 @@ function calculate(list){
     }
     return sum;
 }
-function check(){
+function check(){ //return 1: dealer wins, 2 - blackjack, 3 - playerwins, 0-stand again
     let playerPoint = calculate(game.player.hand);
     let dealerPoint = calculate(game.dealer.activeCards);
     if(playerPoint>21){
         console.log("DEALER WINS");
+        return 1;
     }
     else if(playerPoint === 21){
         console.log("BLACKJACK");
+        return 2;
     }
     else if(dealerPoint>=playerPoint && dealerPoint < 22){
         console.log("DEALER WINS");
+        return 1;
     }
     else if(dealerPoint>=22){
         console.log("PLAYER WINS");
+        return 3;
     }
     
     else{
         console.log("STAND AGAIN");
+        return 0;
     }
 }
 game = new GameBoard();
+var shownCards = 0; //nushownCardsmber of cards already shown, helps displayCard function
+var standIndex = 0;
 game.initial();
+displayCards(shownCards,3);
+shownCards+=1;
 
-console.log(game.player.hand, calculate(game.player.hand));
-console.log(game.dealer.activeCards, calculate(game.dealer.activeCards));
-
+score(game.dealer.activeCards, game.player.hand);
 var hitBtn = document.getElementById("hit");
 hitBtn.addEventListener("click", function(){
     game.player.hand.push(game.pickCard());
-    console.log(game.player.hand, calculate(game.player.hand));
-    console.log(game.dealer.activeCards, calculate(game.dealer.activeCards));
+    
+    score(game.dealer.activeCards, game.player.hand);
     var currentSum = calculate(game.player.hand);
     if(currentSum > 21){
         console.log("DEALER WINS");
     }
-
+    shownCards ++;
+    displayCards(shownCards,1);
 });
 
 var stand = document.getElementById("stand");
-stand.addEventListener("click", function(){
 
+stand.addEventListener("click", function(){
     while(calculate(game.dealer.activeCards) < calculate(game.player.hand)){
         
         game.dealer.activeCards.push(game.pickCard())
@@ -109,11 +117,45 @@ stand.addEventListener("click", function(){
         if(calculate(game.player.hand) == 21){
             break;
         }
-        console.log(game.player.hand, calculate(game.player.hand));
-        console.log(game.dealer.activeCards, calculate(game.dealer.activeCards));
+        score(game.dealer.activeCards, game.player.hand);
+        standIndex++;
+        displayCards(standIndex, 2);
+        //hiddenCardHandler(false);
     }
 })
 
 
 //render cards function that shows the cards?
 
+function displayCards(startIndex, action){ // action: 1 - hit, 2 - stand 3-reset
+    let playerSelector = document.querySelector('.player-cards');
+    let dealerSelector = document.querySelector('.dealer-cards');
+
+    if(action == 1 || action == 3){
+        for( var i = startIndex; i < game.player.hand.length; i ++){
+            let imgName = game.player.hand[i][0];
+            //creating img
+            let imgElement = document.createElement('img');
+            imgElement.src = `img/cards/${imgName.k}.png`;
+            playerSelector.appendChild(imgElement);
+        }
+    }
+    if(action == 2 || action == 3){
+        for(var i = startIndex; i < game.dealer.activeCards.length; i ++){
+            let imgName = game.dealer.activeCards[i][0];
+            //creating img
+            
+            
+            let imgElement = document.createElement('img');
+            imgElement.src = `img/cards/${imgName.k}.png`;
+            dealerSelector.appendChild(imgElement);
+        }
+        
+    }
+
+
+}
+function score(listDealer, listPlayer){
+    document.getElementsByTagName('score')[0].innerHTML = calculate(listDealer);
+    document.getElementsByTagName('score')[1].innerHTML = calculate(listPlayer);
+}
