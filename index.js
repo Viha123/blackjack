@@ -64,20 +64,25 @@ function calculate(list){
 function check(){ //return 1: dealer wins, 2 - blackjack, 3 - playerwins, 0-stand again
     let playerPoint = calculate(game.player.hand);
     let dealerPoint = calculate(game.dealer.activeCards);
+    var winnerElement = document.createElement('h2');
+    var container = document.querySelector(".container");
+    winnerElement.style.gridColumn = "1/6";
+    winnerElement.style.gridRow = "2/4";
+    container.appendChild(winnerElement);
     if(playerPoint>21){
-        console.log("DEALER WINS");
+        winnerElement.innerHTML = "DEALER WINS";
         return 1;
     }
     else if(playerPoint === 21){
-        console.log("BLACKJACK");
+        winnerElement.innerHTML = "BLACKJACK";
         return 2;
     }
     else if(dealerPoint>=playerPoint && dealerPoint < 22){
-        console.log("DEALER WINS");
+        winnerElement.innerHTML = "DEALER WINS";
         return 1;
     }
     else if(dealerPoint>=22){
-        console.log("PLAYER WINS");
+        winnerElement.innerHTML = "PLAYER WINS";
         return 3;
     }
     
@@ -90,7 +95,7 @@ game = new GameBoard();
 var shownCards = 0; //nushownCardsmber of cards already shown, helps displayCard function
 var standIndex = 0;
 game.initial();
-displayCards(shownCards,3);
+displayCards(shownCards,3,game.player.hand, game.dealer.activeCards);
 shownCards+=1;
 
 score(game.dealer.activeCards, game.player.hand);
@@ -104,7 +109,7 @@ hitBtn.addEventListener("click", function(){
         console.log("DEALER WINS");
     }
     shownCards ++;
-    displayCards(shownCards,1);
+    displayCards(shownCards,1,game.player.hand, game.dealer.activeCards);
 });
 
 var stand = document.getElementById("stand");
@@ -119,21 +124,35 @@ stand.addEventListener("click", function(){
         }
         score(game.dealer.activeCards, game.player.hand);
         standIndex++;
-        displayCards(standIndex, 2);
+        displayCards(standIndex, 2,game.player.hand, game.dealer.activeCards);
         //hiddenCardHandler(false);
     }
+})
+
+var reset = document.getElementById("reset");
+
+reset.addEventListener("click", function(){
+    resetCards();
+    
+    var game = new GameBoard();
+    
+    game.initial();
+    shownCards = 0;
+    standIndex = 0;
+    console.log(game.player.hand)
+    displayCards(0,3,game.player.hand, game.dealer.activeCards);
 })
 
 
 //render cards function that shows the cards?
 
-function displayCards(startIndex, action){ // action: 1 - hit, 2 - stand 3-reset
-    let playerSelector = document.querySelector('.player-cards');
-    let dealerSelector = document.querySelector('.dealer-cards');
-
+function displayCards(startIndex, action,listP, listD){ // action: 1 - hit, 2 - stand 3-reset
+    var playerSelector = document.querySelector('.player-cards');
+    var dealerSelector = document.querySelector('.dealer-cards');
+    console.log(listP);
     if(action == 1 || action == 3){
-        for( var i = startIndex; i < game.player.hand.length; i ++){
-            let imgName = game.player.hand[i][0];
+        for( var i = startIndex; i < listP.length; i ++){
+            let imgName = listP[i][0];
             //creating img
             let imgElement = document.createElement('img');
             imgElement.src = `img/cards/${imgName.k}.png`;
@@ -141,8 +160,8 @@ function displayCards(startIndex, action){ // action: 1 - hit, 2 - stand 3-reset
         }
     }
     if(action == 2 || action == 3){
-        for(var i = startIndex; i < game.dealer.activeCards.length; i ++){
-            let imgName = game.dealer.activeCards[i][0];
+        for(var i = startIndex; i < listD.length; i ++){
+            let imgName = listD[i][0];
             //creating img
             
             
@@ -158,4 +177,32 @@ function displayCards(startIndex, action){ // action: 1 - hit, 2 - stand 3-reset
 function score(listDealer, listPlayer){
     document.getElementsByTagName('score')[0].innerHTML = calculate(listDealer);
     document.getElementsByTagName('score')[1].innerHTML = calculate(listPlayer);
+}
+function resetCards(){
+    // // for(var i = game.player.hand.length-1; i >= 0; i --){
+        
+    // //     let cardTemp = game.player.hand[i];
+    // //     game.deck.push(cardTemp);
+    // //     delete game.player.hand[i];
+    // // }
+    // for(const card in game.player.hand){
+    //     delete game.player.hand[card];
+    // }
+    // for(var i = game.dealer.activeCards.length-1; i >= 0; i --){
+    //     let cardTemp = game.dealer.activeCards.pop();
+    //     game.deck.push(cardTemp);
+    // }
+    // console.log(game.player.hand);
+    // var dealerSelector = document.querySelector(".dealer")
+    // for(var i = 0; i < game.dealer.activeCards.length; i ++){
+    //     let imgName = game.dealer.activeCards[i][0];
+    //     //creating img
+        
+        
+    //     let imgElement = document.createElement('img');
+    //     imgElement.src = `img/cards/${imgName.k}.png`;
+    //     dealerSelector.removeChild(imgElement);
+    // }
+    document.querySelector(".player-cards").innerHTML = "";
+    document.querySelector(".dealer-cards").innerHTML = "";
 }
