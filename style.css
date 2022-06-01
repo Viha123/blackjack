@@ -9,8 +9,9 @@
     display: grid;
     margin: 10vh 20vw 10vh 20vw;
     grid-template-columns: repeat(5,1fr);
+    grid-template-rows: auto;
     justify-items: center;
-    grid-gap: 5vh 5vw;
+    grid-gap: 7vh 5vw;
     color: white;
     font-size: 1.5rem;;
 }
@@ -25,8 +26,20 @@
 }
 .dealer{
     padding: 2rem;
+    justify-self: start;
 }
 .player{
     padding: 2rem;
+    justify-self: start;
     
+}
+.dealer-cards{
+    grid-column: 2/4;
+    grid-row-start: 4;
+    justify-self:start;
+}
+.player-cards{
+    grid-column: 4/7;
+    grid-row-start: 4;
+    justify-self: start;
 }
