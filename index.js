@@ -1,11 +1,7 @@
-
-
-//class Person (Object player and dealer)
-//class GameBoard (displays all score and stuff) 
-//lets just assume that I am making a cli game right now
 var startingBalance = 100; //for now it is hundred, later it will be an input from player
 //var bet = parseInt(window.prompt("Enter betting amount" ));
 var bet = 100; //for now, so that I can use the terminal
+
 class Person{
     constructor(start){
         this.hand = [];
@@ -49,6 +45,7 @@ class GameBoard{
         
         let card = this.pickCard();
         this.dealer.activeCards.push(card);
+        score(this.dealer.activeCards, this.player.hand);
     }
 }
 
@@ -64,11 +61,7 @@ function calculate(list){
 function check(){ //return 1: dealer wins, 2 - blackjack, 3 - playerwins, 0-stand again
     let playerPoint = calculate(game.player.hand);
     let dealerPoint = calculate(game.dealer.activeCards);
-    var winnerElement = document.createElement('h2');
-    var container = document.querySelector(".container");
-    winnerElement.style.gridColumn = "1/6";
-    winnerElement.style.gridRow = "2/4";
-    container.appendChild(winnerElement);
+    
     if(playerPoint>21){
         winnerElement.innerHTML = "DEALER WINS";
         return 1;
@@ -97,16 +90,24 @@ var standIndex = 0;
 game.initial();
 displayCards(shownCards,3,game.player.hand, game.dealer.activeCards);
 shownCards+=1;
-
+var winnerElement = document.createElement('h2'); //needs to be used in 2 spots, so might as well define it here only
+var container = document.querySelector(".container");
+winnerElement.style.gridColumn = "1/6";
+winnerElement.style.gridRow = "2/4";
+container.appendChild(winnerElement);
 score(game.dealer.activeCards, game.player.hand);
 var hitBtn = document.getElementById("hit");
 hitBtn.addEventListener("click", function(){
     game.player.hand.push(game.pickCard());
-    
+    console.log(game.player.hand);
     score(game.dealer.activeCards, game.player.hand);
     var currentSum = calculate(game.player.hand);
+
     if(currentSum > 21){
-        console.log("DEALER WINS");
+        winnerElement.innerHTML = "DEALER WINS";
+    }
+    if(currentSum == 21){
+        winnerElement.innerHTML = '<img src=\"img/blackjack.png">'
     }
     shownCards ++;
     displayCards(shownCards,1,game.player.hand, game.dealer.activeCards);
@@ -132,15 +133,8 @@ stand.addEventListener("click", function(){
 var reset = document.getElementById("reset");
 
 reset.addEventListener("click", function(){
-    resetCards();
     
-    var game = new GameBoard();
-    
-    game.initial();
-    shownCards = 0;
-    standIndex = 0;
-    console.log(game.player.hand)
-    displayCards(0,3,game.player.hand, game.dealer.activeCards);
+    document.location.reload();
 })
 
 
@@ -149,7 +143,7 @@ reset.addEventListener("click", function(){
 function displayCards(startIndex, action,listP, listD){ // action: 1 - hit, 2 - stand 3-reset
     var playerSelector = document.querySelector('.player-cards');
     var dealerSelector = document.querySelector('.dealer-cards');
-    console.log(listP);
+    // console.log(listP);
     if(action == 1 || action == 3){
         for( var i = startIndex; i < listP.length; i ++){
             let imgName = listP[i][0];
@@ -162,9 +156,6 @@ function displayCards(startIndex, action,listP, listD){ // action: 1 - hit, 2 - 
     if(action == 2 || action == 3){
         for(var i = startIndex; i < listD.length; i ++){
             let imgName = listD[i][0];
-            //creating img
-            
-            
             let imgElement = document.createElement('img');
             imgElement.src = `img/cards/${imgName.k}.png`;
             dealerSelector.appendChild(imgElement);
@@ -178,31 +169,12 @@ function score(listDealer, listPlayer){
     document.getElementsByTagName('score')[0].innerHTML = calculate(listDealer);
     document.getElementsByTagName('score')[1].innerHTML = calculate(listPlayer);
 }
+function scoreReset(listDealer, listPlayer){
+    document.getElementsByTagName('score')[0].innerHTML = "0";
+    document.getElementsByTagName('score')[1].innerHTML = "0";
+}
 function resetCards(){
-    // // for(var i = game.player.hand.length-1; i >= 0; i --){
-        
-    // //     let cardTemp = game.player.hand[i];
-    // //     game.deck.push(cardTemp);
-    // //     delete game.player.hand[i];
-    // // }
-    // for(const card in game.player.hand){
-    //     delete game.player.hand[card];
-    // }
-    // for(var i = game.dealer.activeCards.length-1; i >= 0; i --){
-    //     let cardTemp = game.dealer.activeCards.pop();
-    //     game.deck.push(cardTemp);
-    // }
-    // console.log(game.player.hand);
-    // var dealerSelector = document.querySelector(".dealer")
-    // for(var i = 0; i < game.dealer.activeCards.length; i ++){
-    //     let imgName = game.dealer.activeCards[i][0];
-    //     //creating img
-        
-        
-    //     let imgElement = document.createElement('img');
-    //     imgElement.src = `img/cards/${imgName.k}.png`;
-    //     dealerSelector.removeChild(imgElement);
-    // }
+   
     document.querySelector(".player-cards").innerHTML = "";
     document.querySelector(".dealer-cards").innerHTML = "";
 }
